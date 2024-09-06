@@ -26,6 +26,7 @@ class CourseClass(models.Model):
     students = models.ManyToManyField(User, related_name='course_class_students',blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    attendances = models.ManyToManyField(User, related_name='course_class_attendances',blank=True)
 
     def __str__(self):
         return f's{self.number} -{self.course.name}'

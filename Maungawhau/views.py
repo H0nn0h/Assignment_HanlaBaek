@@ -1,13 +1,15 @@
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from Maungawhau.models import CourseClass, Semester, Course, Lecturer
-from Maungawhau.forms import  CreateForm
+from Maungawhau.forms import CreateForm
 from django.contrib.auth.models import User
 
 from django.db.models import Q
 from django.views.generic import ListView
 import pandas as pd
+
 
 # Create your views here.
 
@@ -15,13 +17,18 @@ class HomeView(ListView):
     model = CourseClass
     template_name = 'home.html'
     ordering = ['-created_at']
+
+
 class ClassDetailView(DetailView):
     model = CourseClass
     template_name = 'class_detail.html'
+
+
 class ClassCreateView(CreateView):
     model = CourseClass
     form_class = CreateForm
     template_name = 'class_create.html'
+
 
 class ClassUpdateView(UpdateView):
     model = CourseClass
@@ -31,11 +38,14 @@ class ClassUpdateView(UpdateView):
     def get_success_url(self):
         return f'/class_detail/{self.object.id}/'
 
+
 class ClassDeleteView(DeleteView):
     model = CourseClass
     template_name = 'class_delete.html'
+
     def get_success_url(self):
         return reverse_lazy('home')
+
 
 def create_class(request):
     if request.method == 'GET':
@@ -62,6 +72,7 @@ def create_class(request):
 
     return redirect(f'/class_detail/{new_class.id}/')
 
+
 # search function
 class SearchResultsView(ListView):
     model = CourseClass
@@ -76,16 +87,14 @@ class SearchResultsView(ListView):
         )
 
 def attend_or_not(request):
-    if request.method =='COURSE':
-        course_id = request.POST.get('course_id')
-        course = Course.objects.get(id=course_id)
+    if request.method == 'POST':
+        courseClass = get_object_or_404(CourseClass, id=request.POST.get('course_id'))
 
-        if request.user in course.absents.all():
-            course.absents.remove(request.user)
+        # 참석 추가/제거 처리
+        if request.user in courseClass.attendances.all():
+            courseClass.attendances.remove(request.user)
         else:
-            course.absents.add(request.user)
+            courseClass.attendances.add(request.user)
 
-        return render(request,
-                      'class_detail.html',
-                      {'course': course})
 
+        return HttpResponseRedirect(reverse('class_detail', args=[str(courseClass.id)]))
