@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Create Lecturer
+{% endblock %}
+{% block content %}
+
+    <p>{{ object.created_at }}</p>
+    <p>{{ object.updated_at }}</p>
+
+    <style>
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            padding: 0;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .content {
+            display: flex;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between; /* 검색바와 제목을 양쪽에 배치 */
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .search_course .form-control {
+            width: 250px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .search_course .btn {
+            margin-left: 10px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search_course .btn:hover {
+            background-color: #45a049;
+        }
+
+        .right-panels {
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 0 15px;
+            width: 100%;
+        }
+
+        .create-new {
+            margin-top: 30px;
+        }
+
+    </style>
+
+    <div class="container">
+        <main class="main-content">
+            <div class="content">
+
+                <section class="right-panels">
+                    <!-- Search Section -->
+                    <div class="header-section">
+                       
+
+                        <!-- Create New Lecturer Section -->
+                        <div class="create-new">
+                            <h1>Create New Lecturer</h1>
+                            <form method="POST" action="{% url 'lecturer_create' %}">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+
+                                <button type="submit" class="btn btn-primary">Create Lecturer</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+{% endblock %}

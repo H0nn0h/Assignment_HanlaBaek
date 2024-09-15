@@ -70,9 +70,6 @@
             width: 100%;
         }
 
-        .create-new {
-            margin-top: 30px;
-        }
 
     </style>
 
@@ -82,55 +79,37 @@
 
                 <section class="right-panels">
                     <div class="header-section">
-                        <h2>Search</h2>
+                        <h2>Searchr</h2>
                         <div class="search_course" id="searchbar">
-                            <form class="d-flex" method="GET" action="{% url 'class_create' %}">
+                            <form class="d-flex" method="GET" action="{% url 'student_create' %}">
                                 {% csrf_token %}
-                                <input class="form-control" type="search" placeholder="Search Class Number"
+                                <input class="form-control" type="search" placeholder="Search student Number"
                                        name="searched"
                                        aria-label="Search">
                                 <button class="btn" type="submit">Search</button>
                             </form>
                         </div>
                     </div>
-
+                    <!-- 클래스 생성 폼 등 내용 -->
                     <div class="create-new">
-                        <h1>Create New Class</h1>
-                        <form method="POST" action="{% url 'class_create' %}">
+                        <h1>Create New Student</h1>
+                        <form method="POST" action="{% url 'lecturer_create' %}">
                             {% csrf_token %}
-
-                            <p>Class Number:<br>
-                                <input type="text" name="class_number" required></p>
-
-                            <p>Course: <br>
-                                <select name="course_id" required>
-                                    {% for course in courses %}
-                                        <option value="{{ course.id }}">{{ course.name }}</option>
-                                    {% endfor %}
-
-                                </select></p>
-                            <p>Semester: <br>
-                                <select name="semester_id" required>
-                                    {% for semester in semesters %}
-                                        <option value="{{ semester.id }}">{{ semester.semester }}{semester.year }}
-                                        </option>
-                                    {% endfor %}
-
-                                </select></p>
-                            <p>Lecturer:<br>
-                                <select name="lecturer_id" required>
-                                    {% for lecturer in lecturers %}
-                                        <option value="{{ lecturer.id }}">{{ lecturer.user.get_full_name }}</option>
-                                    {% endfor %}
-
-                                </select>
-
-
-                            </p>
-
-                            <button type="submit" class="btn btn-primary">Create class</button>
+                            <p>First Name:<br>
+                                <input type="text" name="first_name" required></p>
+                            <p>Last Name: <br>
+                                <input type="text" name="last_name" required></p>
+                            <p>Date Of Birth: <br>
+                                <input type="date" name="dob" required></p>
+                            <p>Phone: <br>
+                                <input type="number" name="phone" required></p>
+                            <p>Address: <br>
+                                <input type="text" name="address" required></p>
+                            <button type="submit" class="btn btn-primary">Create Student</button>
                         </form>
                     </div>
+
+
                 </section>
             </div>
         </main>

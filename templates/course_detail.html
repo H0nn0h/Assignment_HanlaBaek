@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}
+    Course Detail
+{% endblock %}
+{% block content %}
+    <p><strong>Code:</strong> {{ course.code }}</p>
+    <p><strong>Name:</strong> {{ course.name }}</p>
+
+    {% if user.is_authenticated %}
+            <a href="{% url 'course_update' course.pk %}" class="btn btn-secondary">Update</a>
+            <a href="{% url 'course_delete' course.pk %}" class="btn btn-danger">Delete</a>
+        
+    {% endif %}
+
+{% endblock %}

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Class Update
+    Course Update
 {% endblock %}
 
 {% block content %}
-    <h1>Class Update</h1>
+    <h1>Course Update</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}

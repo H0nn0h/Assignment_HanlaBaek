@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Create or Search Classes
+{% endblock %}
+{% block content %}
+
+    <p>{{ object.created_at }}</p>
+    <p>{{ object.updated_at }}</p>
+
+    <style>
+
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            padding: 0;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+
+        }
+
+        .content {
+            display: flex;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+        / align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .button .form-control {
+            width: 250px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .button .btn {
+            margin-left: 10px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button .btn:hover {
+            background-color: #45a049;
+        }
+
+        .right-panels {
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 0 15px;
+            width: 100%;
+        }
+
+        .create-new {
+            margin-top: 30px;
+        }
+
+    </style>
+
+    <div class="container">
+        <main class="main-content">
+            <div class="content">
+
+                <section class="right-panels">
+                    <div class="header-section">
+                        <h2>Create New Semester</h2>
+                        <form class="d-flex" method="GET" action="{% url 'semester_create' %}">
+                            {% csrf_token %}
+
+                        </form>
+                    </div>
+                    <div class="create-new">
+                        <h1>Create New Semester</h1>
+                        <form method="POST" action="{% url 'semester_create' %}">
+                            {% csrf_token %}
+                            <p>Year:</p>
+                            <input type="number" name="year" required>
+                            <p>Semester :</p> <BR>
+                            <input type="text" name="semester" required>
+                            
+                            <button type="submit" class="btn btn-primary">Create Semester</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+{% endblock %}

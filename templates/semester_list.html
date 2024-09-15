@@ -1,0 +1,32 @@
+<!-- semester_list.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Semester List</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Semester</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for semester in semesters %}
+                <tr>
+                    <td>{{ semester.year }}</td>
+                    <td>{{ semester.semester }}</td>
+                    <td>
+                        <a href="{% url 'semester_update' semester.id %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'semester_delete' semester.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">No semesters available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'semester_create' %}" class="btn btn-success">Add New Semester</a>
+{% endblock %}

@@ -6,6 +6,8 @@
         {% block title %}
         {% endblock %}
     </title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -75,39 +77,116 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px; /* 이니셜 크기 */
+            font-size: 14px;
             color: #fff;
             font-weight: bold;
-            text-transform: uppercase; /* 대문자로 변환 */
-            line-height: 30px; /* 아이콘 크기와 동일하게 설정 */
-            text-align: center; /* 중앙 정렬 */
+            text-transform: uppercase;
+            line-height: 30px;
+            text-align: center;
         }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-left: 15px;
+        }
+
     </style>
 </head>
 <body>
 <!-- 좌측 사이드바 -->
 <div class="sidebar">
-    <img src="image/logo.png" alt="logo" class="navbar-brand text-light">
-        <ul class="navbar-nav flex-column">
+    {% load static %}
+    <img src="{% static 'images/logo.png' %}" alt="logo" class="logo navbar-brand text-light">
+    <ul class="navbar-nav flex-column">
         <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
         </li>
-        <li class="nav-item">
+        <div class="nav-item">
             {% if user.is_authenticated %}
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type='submit' class="btn btn-link text-light">Logout</button>
+                    <button type='submit' class="btn btn-link">Logout</button>
                 </form>
             {% else %}
-                <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <button type='submit' class="btn btn-link">LogIn</button>
+                </form>
             {% endif %}
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">My Profile</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">My Class</a>
-        </li>
+        </div>
+        <!--Only admin-->
+        {% if user.is_staff %}
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#classDropdown" role="button" aria-expanded="false"
+                   aria-controls="classDropdown">
+                    Class Information <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="collapse" id="classDropdown">
+                    <ul class="list-unstyled">
+                        <li><a class="nav-link" href="{% url 'class_list' %}">Class list</a></li>
+                        <li><a class="nav-link" href="{% url 'class_create' %}">Class Create</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#courseDropdown" role="button" aria-expanded="false"
+                   aria-controls="courseDropdown">
+                    Course Information <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="collapse" id="courseDropdown">
+                    <ul class="list-unstyled">
+                        <li><a class="nav-link" href="{% url 'course_list' %}">Course list</a></li>
+                        <li><a class="nav-link" href="{% url 'course_create' %}">Course Create</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#lecturerDropdown" role="button"
+                   aria-expanded="false"
+                   aria-controls="lecturerDropdown">
+                    Lecturer Information <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="collapse" id="lecturerDropdown">
+                    <ul class="list-unstyled">
+                        <li><a class="nav-link" href="{% url 'lecturer_list' %}">Lecturer list</a></li>
+                        <li><a class="nav-link" href="{% url 'lecturer_create' %}">Lecturer Create</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#studentDropdown" role="button"
+                   aria-expanded="false"
+                   aria-controls="studentDropdown">
+                    Student Information <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="collapse" id="studentDropdown">
+                    <ul class="list-unstyled">
+                        <li><a class="nav-link" href="{% url 'student_list' %}">Student list</a></li>
+                        <li><a class="nav-link" href="{% url 'student_create' %}">Student Create</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'load_user_from_file' %}">Load Attendance</a>
+
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#semesterDropdown" role="button"
+                   aria-expanded="false"
+                   aria-controls="semesterDropdown">
+                    Semester Information <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="collapse" id="semesterDropdown">
+                    <ul class="list-unstyled">
+                        <li><a class="nav-link" href="{% url 'semester_list' %}">Semester list</a></li>
+                        <li><a class="nav-link" href="{% url 'semester_create' %}">Semester Create</a></li>
+                    </ul>
+                </div>
+            </li>
+
+
+        {% endif %}
     </ul>
 </div>
 
@@ -115,19 +194,24 @@
 <nav class="navbar">
     <div class="nav-item">
         <div class="profile-icon">
-                  {{ user.last_name|slice:":1" }}
+            {{ user.last_name|slice:":1" }}
         </div> <!-- 프로필 아이콘 -->
+    </div>
 
-    </div>
-    </div>
     <div class="nav-item">
         <span>{{ user.username }}</span> <!-- 사용자 이름 -->
     </div>
     <div class="nav-item">
+            
         {% if user.is_authenticated %}
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button type='submit' class="btn btn-link">Logout</button>
+            </form>
+        {% else %}
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <button type='submit' class="btn btn-link">LogIn</button>
             </form>
         {% endif %}
     </div>

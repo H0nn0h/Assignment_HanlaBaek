@@ -1,0 +1,35 @@
+<!-- course_list.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Class List</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Class Number</th>
+                <th>Course Name</th>
+                <th>Lecturer</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+                <tr>
+                    <td>{{ course.name }}</td>
+                    <td>{{ course.code }}</td>
+                    <td>{{ lecturer.name }}</td>
+                    <td>
+                        <a href="{% url 'course_detail' course.id %}" class="btn btn-info btn-sm">View</a>
+                        <a href="{% url 'course_update' course.id %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'course_delete' course.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No class available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'class_create' %}" class="btn btn-success">Add New Class</a>
+{% endblock %}

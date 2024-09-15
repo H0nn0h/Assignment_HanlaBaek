@@ -1,0 +1,12 @@
+<!-- semester_confirm_delete.html -->
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Are you sure you want to delete this semester?</h2>
+    <p>{{ object.semester }} ({{ object.year }})</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'semester_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}
+    Lecturer Detail
+{% endblock %}
+{% block content %}
+    <h2>{{ lecturer.user.first_name }} {{ lecturer.user.last_name }}</h2>
+    <p><strong>Staff ID:</strong> {{ lecturer.staff_id }}</p>
+    <p><strong>Date of Birth:</strong> {{ lecturer.DOB }}</p>
+    <p><strong>Phone:</strong> {{ lecturer.phone }}</p>
+    <p><strong>Address:</strong> {{ lecturer.address }}</p>
+
+    {% if user.is_authenticated %}
+        {% if user == lecturer.user %}
+            <a href="{% url 'update_lecturer' lecturer.pk %}" class="btn btn-secondary">Update</a>
+            <a href="{% url 'delete_lecturer' lecturer.pk %}" class="btn btn-danger">Delete</a>
+        {% endif %}
+    {% endif %}
+
+    
+{% endblock %}
