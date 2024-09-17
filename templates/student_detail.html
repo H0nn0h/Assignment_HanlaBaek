@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}
+    Student Detail
+{% endblock %}
+{% block content %}
+    <h2>{{ student.user.first_name }} {{ student.user.last_name }}</h2>
+    <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+    <p><strong>Date of Birth:</strong> {{ student.DOB }}</p>
+    <p><strong>Phone:</strong> {{ student.phone }}</p>
+    <p><strong>Address:</strong> {{ student.address }}</p>
+
+    {% if user.is_authenticated %}
+        {% if user == student.user %}
+            <a href="{% url 'update_student' student.pk %}" class="btn btn-secondary">Update</a>
+            <a href="{% url 'delete_student' student.pk %}" class="btn btn-danger">Delete</a>
+        {% endif %}
+    {% endif %}
+
+    
+{% endblock %}

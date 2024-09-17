@@ -31,15 +31,75 @@ class Semester(models.Model):
         return self.semester
 
 
+def save_user_email(user, dob, email_domain):
+    """User의 이메일을 생성 및 저장하는 함수"""
+    if not user.email:
+        last_name = user.last_name.lower()
+        first_name = user.first_name[0].lower()
+        birth_day = str(dob.day)
+        email = f'{last_name}{first_name}{birth_day}@{email_domain}'
+        user.email = email
+        user.save()
+
+
+class Student(models.Model):
+    student_id = models.IntegerField(unique=True, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    DOB = models.DateField()
+    phone = models.CharField(max_length=20, default='')
+    address = models.CharField(max_length=255, default='')
+
+    def __str__(self):
+        # 유저의 이름과 성을 반환하도록 설정
+        return f'{self.user.first_name} {self.user.last_name}'
+
+    def save(self, *args, **kwargs):
+        # student_id 자동 생성 로직만 유지
+        if not self.student_id:
+            last_student = Student.objects.order_by('student_id').last()
+            if last_student and last_student.student_id:
+                self.student_id = last_student.student_id + 1
+            else:
+                self.student_id = 100000  # 첫 번째 student_id는 100000부터 시작
+
+        save_user_email(self.user, self.DOB, 'mymaungawhau.ac.nz')
+
+        super().save(*args, **kwargs)
+
+
+class Lecturer(models.Model):
+    staff_id = models.IntegerField(unique=True, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    DOB = models.DateField()
+    phone = models.CharField(max_length=20, default='')
+    address = models.CharField(max_length=255, default='')
+
+    def __str__(self):
+        # 유저의 이름과 성을 반환하도록 설정
+        return f'{self.user.first_name} {self.user.last_name}'
+
+    def save(self, *args, **kwargs):
+        # staff_id 자동 생성 로직만 유지
+        if not self.staff_id:
+            last_lecturer = Lecturer.objects.order_by('staff_id').last()
+            if last_lecturer and last_lecturer.staff_id:
+                self.staff_id = last_lecturer.staff_id + 1
+            else:
+                self.staff_id = 1000  # 첫 번째 staff_id는 1000부터 시작
+
+        save_user_email(self.user, self.DOB, 'staffmaungawhau.ac.nz')
+
+        super().save(*args, **kwargs)
+
+
 class CourseClass(models.Model):
     number = models.IntegerField()
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    lecturers = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    lecturers = models.ForeignKey(Lecturer, on_delete=models.SET_NULL, null=True, blank=True)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     attendances = models.ManyToManyField(User, related_name='course_class_attendances', blank=True)
-    image = models.ImageField(upload_to='images/', blank=True, null=True)
 
     def __str__(self):
         return f's{self.number} -{self.course.name}'
@@ -51,64 +111,7 @@ class CourseClass(models.Model):
 class CollegeDay(models.Model):
     date = models.DateField()
     courseClass = models.ForeignKey(CourseClass, on_delete=models.CASCADE)
+    student = models.ManyToManyField(Student)
 
     def __str__(self):
-        return f'college Day on {self.date} for {self.courseClass}'
-
-
-class Student(models.Model):
-    student_id = models.IntegerField(unique=True, blank=True, null=True)  # 6자리 숫자
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    DOB = models.DateField()
-    phone = models.CharField(max_length=20, default='')
-    address = models.CharField(max_length=255, default='')
-
-
-    #email generate
-    def save(self,*args, **kwargs):
-        if not self.user.email:
-            last_name =self.user.last_name.lower()
-            first_name= self.user.first_name[0].lower()
-            birth_day = str(self.DOB.day)
-            email = f'{last_name}{first_name}{birth_day}@mymaungawhau.ac.nz'
-            self.user.email = email
-            self.user.save()
-
-        super().save(*args, **kwargs)
-    def __str__(self):
-        return f'Student {self.user.first_name} {self.user.last_name}'
-
-
-class Lecturer(models.Model):
-    staff_id = models.IntegerField(unique=True, blank=True, null=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    DOB = models.DateField()
-    phone = models.CharField(max_length=20, default='')
-    address = models.CharField(max_length=255, default='')
-
-    def save(self, *args, **kwargs):
-        # staff_id 자동 생성 로직
-        if not self.staff_id:
-            last_lecturer = Lecturer.objects.order_by('staff_id').last()  # 가장 최근에 생성된 Lecturer의 staff_id를 가져옴
-            if last_lecturer and last_lecturer.staff_id:
-                self.staff_id = last_lecturer.staff_id + 1  # staff_id를 이전 staff_id에 1을 더해 설정
-            else:
-                self.staff_id = 1000  # 첫 번째 Lecturer의 staff_id는 1000부터 시작
-
-    #email generate
-        if not self.user.email:
-            last_name = self.user.last_name.lower()
-            first_name = self.user.first_name[0].lower()
-            birth_day =str(self.DOB.day)
-            email = f'{last_name}{first_name}{birth_day}@staffmaungawhau.ac.nz'
-            self.user.email = email
-            self.user.save()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f'Lecturer {self.user.first_name} {self.user.last_name}'
-
-class Enrollment(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    course_class = models.ForeignKey(CourseClass, on_delete=models.CASCADE)
-    date_enrolled = models.DateField(auto_now_add=True)
+        return f'{self.courseClass} on {self.date} ({self.student.count()} students)'

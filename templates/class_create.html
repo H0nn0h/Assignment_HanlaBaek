@@ -82,54 +82,16 @@
 
                 <section class="right-panels">
                     <div class="header-section">
-                        <h2>Search</h2>
-                        <div class="search_course" id="searchbar">
-                            <form class="d-flex" method="GET" action="{% url 'class_create' %}">
+                       
+                        <div class="create-new">
+                            <h1>Create New Class</h1>
+                            <form method="POST" action="{% url 'class_create' %}">
                                 {% csrf_token %}
-                                <input class="form-control" type="search" placeholder="Search Class Number"
-                                       name="searched"
-                                       aria-label="Search">
-                                <button class="btn" type="submit">Search</button>
+                                {{ form.as_p }}
+
+                                <button type="submit" class="btn btn-primary">Create class</button>
                             </form>
                         </div>
-                    </div>
-
-                    <div class="create-new">
-                        <h1>Create New Class</h1>
-                        <form method="POST" action="{% url 'class_create' %}">
-                            {% csrf_token %}
-
-                            <p>Class Number:<br>
-                                <input type="text" name="class_number" required></p>
-
-                            <p>Course: <br>
-                                <select name="course_id" required>
-                                    {% for course in courses %}
-                                        <option value="{{ course.id }}">{{ course.name }}</option>
-                                    {% endfor %}
-
-                                </select></p>
-                            <p>Semester: <br>
-                                <select name="semester_id" required>
-                                    {% for semester in semesters %}
-                                        <option value="{{ semester.id }}">{{ semester.semester }}{semester.year }}
-                                        </option>
-                                    {% endfor %}
-
-                                </select></p>
-                            <p>Lecturer:<br>
-                                <select name="lecturer_id" required>
-                                    {% for lecturer in lecturers %}
-                                        <option value="{{ lecturer.id }}">{{ lecturer.user.get_full_name }}</option>
-                                    {% endfor %}
-
-                                </select>
-
-
-                            </p>
-
-                            <button type="submit" class="btn btn-primary">Create class</button>
-                        </form>
                     </div>
                 </section>
             </div>

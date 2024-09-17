@@ -8,12 +8,14 @@ from django.contrib.auth.models import User, Group
 from Maungawhau.models import Student, Course, Lecturer, CourseClass, CollegeDay, Semester
 
 # Register your models here.
-admin.site.register(Student)
+# admin.site.register(Student)
 # admin.site.register(Course)
 # admin.site.register(Lecturer)
-admin.site.register(CourseClass)
+# admin.site.register(CourseClass)
 admin.site.register(CollegeDay)
-admin.site.register(Semester)
+
+
+# admin.site.register(Semester)
 
 
 def assign_to_group(modeladmin, request, queryset, group_name):
@@ -34,11 +36,9 @@ def assign_to_lecturer_group(modeladmin, request, queryset):
 
         # 동시에 Lecturer 모델에 등록
         if not Lecturer.objects.filter(user=user).exists():
-            Lecturer.objects.create(user=user, DOB=date(1981,10,1))  # 필요시 DOB 등을 실제 데이터로 수정하세요
+            Lecturer.objects.create(user=user, DOB=date(1981, 10, 1))  # 필요시 DOB 등을 실제 데이터로 수정하세요
 
         modeladmin.message_user(request, f"{user.username} has been added to Lecturer group and registered as Lecturer")
-
-
 
 
 def assign_to_student_group(modeladmin, request, queryset):
@@ -47,7 +47,7 @@ def assign_to_student_group(modeladmin, request, queryset):
 
 assign_to_admin_group.short_description = "Add selected users to Admin group"
 assign_to_student_group.short_description = "Add selected users to Student group"
-assign_to_lecturer_group.short_description = "Add selected users to Lecturer group and register as Lecturer"
+assign_to_lecturer_group.short_description = "Add selected users to Lecturer group"
 
 admin.site.unregister(User)
 
@@ -74,7 +74,21 @@ class LecturerAdmin(admin.ModelAdmin):
     list_display = ('user', 'staff_id', 'DOB', 'phone', 'address')
 
 
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ('user', 'student_id', 'DOB', 'phone', 'address')
+
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('id','code','name')
+    list_display = ('id', 'code', 'name')
 
+
+@admin.register(Semester)
+class SemesterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'year', 'semester')
+
+
+@admin.register(CourseClass)
+class CourseClassAdmin(admin.ModelAdmin):
+    list_display = ('id', 'course', 'lecturers', 'semester')

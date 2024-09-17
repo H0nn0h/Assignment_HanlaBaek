@@ -1,22 +1,17 @@
 {% extends 'base.html' %}
 {% block title %}
-    {{ object.title }}
+    Class Detail
 {% endblock %}
 {% block content %}
+    <p><strong>Number:</strong> {{ courseClass.number }}</p>
+    <p><strong>Semester:</strong> {{ courseClass.semester }}</p>
+    <p><strong>Course:</strong> {{ courseClass.course }}</p>
+    <p><strong>Lecturer:</strong> {{ courseClass.lecturers }}</p>
+    
     {% if user.is_authenticated %}
-        {% if user.id == courseClass.auther.id %}
-            <a href="{% url 'update-class' courseClass.pk %}" class="btn btn-secondary">Update</a>
-            <a href="{% url 'delete-class' courseClass.pk %}" class="btn btn-secondary">Delete</a>
-        {% endif %}
+            <a href="{% url 'class_update' courseClass.pk %}" class="btn btn-secondary">Update</a>
+            <a href="{% url 'class_delete' courseClass.pk %}" class="btn btn-danger">Delete</a>
+        
     {% endif %}
-    <a href="{% url 'home' %}">
-        Back to Home
-    </a>
-    <hr>
-    <form action="{% url 'attend-class' courseClass.pk %}" method="POST">
-        {% csrf_token %}
-        <button class="btn btn-secondary" type="submit" name="courseClass_id" value="{{ courseClass.id }}">
-            Attend
-        </button>
-    </form>
+
 {% endblock %}

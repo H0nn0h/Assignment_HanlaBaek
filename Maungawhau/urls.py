@@ -1,18 +1,19 @@
 from django import views
 from django.urls import path
-from Maungawhau.views import HomeView, ClassDetailView, ClassCreateView, ClassUpdateView, ClassDeleteView, create_class, \
+from Maungawhau.views import HomeView, ClassDetailView, ClassUpdateView, ClassDeleteView, create_class, \
     attend_or_not, create_profile, register_user, load_user_from_file, ClassListView, SemesterDeleteView, \
     SemesterListView, CourseDeleteView, CourseListView, LecturerDeleteView, LecturerListView, StudentDeleteView, \
     StudentListView, SemesterCreateView, CourseCreateView, LecturerCreateView, StudentCreateView, LecturerUpdateView, \
-    LecturerDetailView, CourseDetailView, CourseUpdateView
+    LecturerDetailView, CourseDetailView, CourseUpdateView, SemesterUpdateView, SemesterDetailView, StudentUpdateView, \
+    StudentDetailView, ClassCreateView
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
-    path('class_detail/<int:pk>/', ClassDetailView.as_view(), name='class_detail'),
-    path('class_create/', ClassCreateView.as_view(), name='class_create'),
-    path('class_update/<int:pk>/', ClassUpdateView.as_view(), name='class_update'),
-    path('class_delete/<int:pk>/', ClassDeleteView.as_view(), name='class_delete'),
-    path('classes/', ClassListView.as_view(), name='class_list'),
+    path('courseClass_create/', ClassCreateView.as_view(), name='class_create'),
+    path('courseClass/<int:pk>/delete/', ClassDeleteView.as_view(), name='class_delete'),
+    path('class_list/', ClassListView.as_view(), name='class_list'),
+    path('courseClass/<int:pk>/update/', ClassUpdateView.as_view(), name='class_update'),
+    path('courseClass_detail/<int:pk>/', ClassDetailView.as_view(), name='class_detail'),
     path('attend_or_not', attend_or_not, name='attend_or_not'),
     path('user_profile', create_profile, name='create_profile'),
     path('register/', register_user, name='register'),
@@ -22,6 +23,8 @@ urlpatterns = [
     path('semester_create/', SemesterCreateView.as_view(), name='semester_create'),
     path('semesters/<int:pk>/delete/', SemesterDeleteView.as_view(), name='semester_delete'),
     path('semesters/', SemesterListView.as_view(), name='semester_list'),
+    path('semester/<int:pk>/update/', SemesterUpdateView.as_view(), name='semester_update'),
+    path('semester_detail/<int:pk>/', SemesterDetailView.as_view(), name='semester_detail'),
 
     # Course URLs
     path('course_create/', CourseCreateView.as_view(), name='course_create'),
@@ -43,5 +46,7 @@ urlpatterns = [
     path('student_create/', StudentCreateView.as_view(), name='student_create'),
     path('students/<int:pk>/delete/', StudentDeleteView.as_view(), name='student_delete'),
     path('students/', StudentListView.as_view(), name='student_list'),
+    path('student/<int:pk>/update/', StudentUpdateView.as_view(), name='student_update'),
+    path('student_detail/<int:pk>/', StudentDetailView.as_view(), name='student_detail'),
 
 ]

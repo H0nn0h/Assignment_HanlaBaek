@@ -6,14 +6,16 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Year</th>
-                <th>Semester</th>
+                <th>ID</th>
+                <th>Course Year</th>
+                <th>Course Semester</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for semester in semesters %}
                 <tr>
+                    <td>{{ semester.id }}</td>
                     <td>{{ semester.year }}</td>
                     <td>{{ semester.semester }}</td>
                     <td>

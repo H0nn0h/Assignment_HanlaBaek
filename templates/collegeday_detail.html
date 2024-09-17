@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+    College Day Detail
+{% endblock %}
+{% block content %}
+    <p><strong>Date:</strong> {{ collegeday.date }}</p>
+    <p><strong>Class:</strong> {{ collegeday.courseClass }}</p>
+    <p><strong>Student:</strong> {{ collegeday.student }}</p>
+
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'semester_update' semester.pk %}" class="btn btn-secondary">Update</a>
+        <a href="{% url 'semester_delete' semester.pk %}" class="btn btn-danger">Delete</a>
+
+    {% endif %}
+
+{% endblock %}

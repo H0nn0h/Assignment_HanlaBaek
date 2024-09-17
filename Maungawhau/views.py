@@ -2,8 +2,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy, reverse
-from Maungawhau.models import CourseClass, Semester, Course, Lecturer, Profile, Student
-from Maungawhau.forms import CreateForm, createLecturerForm, createCoursesForm
+from Maungawhau.models import CourseClass, Semester, Course, Lecturer, Profile, Student, CollegeDay
+from Maungawhau.forms import createCourseClassForm, createLecturerForm, createCoursesForm, createSemestersForm, \
+    createStudentsForm, createCollegeDaysForm
 from django.contrib.auth.models import User
 
 from django.db.models import Q
@@ -22,6 +23,7 @@ class HomeView(ListView):
 class ClassDetailView(DetailView):
     model = CourseClass
     template_name = 'class_detail.html'
+    context_object_name = 'courseClass'
 
 
 class LecturerDetailView(DetailView):
@@ -29,15 +31,37 @@ class LecturerDetailView(DetailView):
     template_name = 'lecturer_detail.html'
 
 
+class StudentDetailView(DetailView):
+    model = Student
+    template_name = 'student_detail.html'
+
+
 class CourseDetailView(DetailView):
     model = Course
     template_name = 'course_detail.html'
 
 
+class SemesterDetailView(DetailView):
+    model = Semester
+    template_name = 'semester_detail.html'
+
+
+class CollegeDayDetailView(DetailView):
+    model = CollegeDay
+    template_name = 'collegeday_detail.html'
+
+
 class ClassCreateView(CreateView):
     model = CourseClass
-    form_class = CreateForm
+    form_class = createCourseClassForm
     template_name = 'class_create.html'
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('class_list')
 
 
 class CourseCreateView(CreateView):
@@ -55,8 +79,41 @@ class CourseCreateView(CreateView):
 
 class SemesterCreateView(CreateView):
     model = Semester
-    form_class = CreateForm
+    form_class = createSemestersForm
     template_name = 'semester_create.html'
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('semester_list')
+
+
+class CollegeDayCreateView(CreateView):
+    model = CollegeDay
+    form_class = createCollegeDaysForm
+    template_name = 'collegeday_create.html'
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('collegeday_list')
+
+
+# generate unique username
+def gen_unique_username(first_name, last_name, dob):
+    base_username = f"{first_name[0].lower()}{last_name.lower()}{dob.year}"
+    username = base_username
+    counter = 1
+
+    while User.objects.filter(username=username).exists():
+        username = f'{base_username}{counter}'
+        counter += 1
+
+    return username
 
 
 class LecturerCreateView(CreateView):
@@ -66,30 +123,84 @@ class LecturerCreateView(CreateView):
     success_url = reverse_lazy('lecturer_list')
 
     def form_valid(self, form):
-        lecturer = form.save(commit=False)
-        user = lecturer.user
+        first_name = form.cleaned_data['first_name']
+        last_name = form.cleaned_data['last_name']
         dob = form.cleaned_data['DOB']
-        default_password = dob.strftime('%d%m%Y')
-        user.set_password(default_password)
-        user.save()
-        lecturer.save()
+
+        username = gen_unique_username(first_name, last_name, dob)
+
+        default_password = dob.strftime('%d%m%Y')  # ddmmyyyy 형식으로 변환
+
+        # User 객체 생성
+        user = User.objects.create_user(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            password=default_password  # 비밀번호 설정
+        )
+
+        # Lecturer와 User를 연결
+        lecturer = form.save(commit=False)  # Lecturer 객체를 생성하되, 아직 DB에 저장하지 않음
+        lecturer.user = user  # User와 연결
+        lecturer.save()  # Lecturer 객체 저장
+
         return super().form_valid(form)
 
 
 class StudentCreateView(CreateView):
     model = Student
-    form_class = CreateForm
+    form_class = createStudentsForm
     template_name = 'student_create.html'
+    success_url = reverse_lazy('student_list')
+
+    def form_valid(self, form):
+        # 유저 먼저 생성
+        first_name = form.cleaned_data['first_name']
+        last_name = form.cleaned_data['last_name']
+        dob = form.cleaned_data['DOB']
+
+        username = gen_unique_username(first_name, last_name, dob)
+
+        default_password = dob.strftime('%d%m%Y')
+        user = User.objects.create(
+            username=username,
+            first_name=first_name,
+            last_name=last_name
+        )
+
+        user.set_password(default_password)
+        user.save()
+
+        # Student와 User를 연결
+        student = form.save(commit=False)
+        student.user = user  # User와 연결
+        student.save()
+
+        return super().form_valid(form)
 
 
 class ClassUpdateView(UpdateView):
     model = CourseClass
-    form_class = CreateForm
+    fields = ['number', 'course', 'semester', 'lecturers']
     template_name = 'class_update.html'
-    context_object_name = 'class'
+    context_object_name = 'courseClass'
+    success_url = '/class_list/'
 
-    def get_success_url(self):
-        return f'/class_detail/{self.object.id}/'
+
+class SemesterUpdateView(UpdateView):
+    model = Semester
+    form_class = createSemestersForm
+    template_name = 'semester_update.html'
+    context_object_name = 'semester'
+    success_url = reverse_lazy('semester_list')
+
+
+class CollegedayUpdateView(UpdateView):
+    model = CollegeDay
+    form_class = createCollegeDaysForm
+    template_name = 'collegeday_update.html'
+    context_object_name = 'collegeday'
+    success_url = reverse_lazy('collegeday_list')
 
 
 class LecturerUpdateView(UpdateView):
@@ -101,6 +212,17 @@ class LecturerUpdateView(UpdateView):
 
     def get_success_url(self):
         return f'/lecturer_detail/{self.object.id}/'
+
+
+class StudentUpdateView(UpdateView):
+    model = Student
+    form_class = createStudentsForm
+    template_name = 'student_update.html'
+    context_object_name = 'student'
+    success_url = reverse_lazy('student_list')
+
+    def get_success_url(self):
+        return f'/student_detail/{self.object.id}/'
 
 
 class CourseUpdateView(UpdateView):
@@ -117,7 +239,7 @@ class CourseUpdateView(UpdateView):
 class ClassListView(ListView):
     model = CourseClass
     template_name = 'class_list.html'
-    context_object_name = 'classes'
+    context_object_name = 'courseClasses'
 
 
 class SemesterListView(ListView):
@@ -131,6 +253,10 @@ class CourseListView(ListView):
     template_name = 'course_list.html'
     context_object_name = 'courses'
 
+class CollegedayListView(ListView):
+    model = CollegeDay
+    template_name = 'collegeday_list.html'
+    context_object_name = 'collegedays'
 
 class LecturerListView(ListView):
     model = Lecturer
@@ -147,6 +273,11 @@ class StudentListView(ListView):
     model = Student
     template_name = 'student_list.html'
     context_object_name = 'students'
+
+
+def student_list(request):
+    students = Student.objects.all()
+    return render(request, 'student_list.html', {'students': students})
 
 
 class ClassDeleteView(DeleteView):
@@ -232,9 +363,20 @@ def create_lecturer(request):
     return render(request, 'lecturer_create.html')
 
 
+def create_student(request):
+    if request.method == 'POST':
+        form = createStudentsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('student_list')
+    else:
+        form = createStudentsForm()
+    return render(request, 'student_create.html')
+
+
 def create_courses(request):
     if request.method == 'POST':
-        form = createCoursesForm(request.Post)
+        form = createCoursesForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('course_list')
@@ -243,20 +385,18 @@ def create_courses(request):
     return render(request, 'course_create.html')
 
 
-# search function
-class SearchResultsView(ListView):
-    model = CourseClass
-    template_name = 'class_create.html'
-
-    def get_queryset(self):
-        query = self.request.GET.get('searched')
-        return CourseClass.objects.filter(
-            Q(number__icontains=query) |
-            Q(course__name__icontains=query) |
-            Q(semester__semester__icontains=query)
-        )
+def create_semester(request):
+    if request.method == 'POST':
+        form = createSemestersForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('semester_list')
+    else:
+        form = createSemestersForm()
+    return render(request, 'semester_create.html')
 
 
+# need to make connection with student
 def attend_or_not(request):
     if request.method == 'POST':
         courseClass_id = request.POST.get('course_id')

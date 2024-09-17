@@ -2,12 +2,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Class List</h2>
+    <h2>Enroll List</h2>
     <table class="table table-striped">
         <thead>
         <tr>
             <th>ID</th>
-            <th>Class Number</th>
+            <th>Date</th>
             <th>Course Name</th>
             <th>Lecturer</th>
             <th>Semester</th>
@@ -15,7 +15,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for courseClass in courseClasses %}
+        {% for collegeDay in collegedays %}
             <tr>
                 <td>{{ courseClass.id }}</td>
                 <td>{{ courseClass.number }}</td>

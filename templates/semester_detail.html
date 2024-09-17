@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}
+    Semester Detail
+{% endblock %}
+{% block content %}
+    <p><strong>Year:</strong> {{ semester.year }}</p>
+    <p><strong>Semester:</strong> {{ semester.semester }}</p>
+
+    {% if user.is_authenticated %}
+            <a href="{% url 'semester_update' semester.pk %}" class="btn btn-secondary">Update</a>
+            <a href="{% url 'semester_delete' semester.pk %}" class="btn btn-danger">Delete</a>
+        
+    {% endif %}
+
+{% endblock %}
