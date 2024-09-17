@@ -18,6 +18,7 @@ class createCourseClassForm(forms.ModelForm):
         required=False
     )
 
+
 class createLecturerForm(forms.ModelForm):
     first_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -124,36 +125,19 @@ class createSemestersForm(forms.ModelForm):
             semester.save()
         return semester
 
-class createCollegeDaysForm(forms.ModelForm):
+
+class CollegeDayForm(forms.ModelForm):
     class Meta:
         model = CollegeDay
-        fields = ('date','courseClass','student')
+        fields = ['student', 'courseClass', 'day_of_week', 'attendance_status']
 
-        date = forms.DateField(
-            widget = forms.SelectDateWidget(),
-            help_text='Select a Weekday (Mon to Fri).'
-        )
-        courseClass = forms.ModelMultipleChoiceField(
-            queryset=CourseClass.objects.all(),
-            widget=forms.CheckboxSelectMultiple,
-            help_text='Select up to 3 Class.',
-            limit_choices_to={'id__lt':4},
-        )
-        student = forms.ModelMultipleChoiceField(
-            queryset=Student.objects.all(),
-            widget=forms.CheckboxSelectMultiple,
-            help_text='Select students'
-        )
+        widgets = {
+            'day_of_week': forms.Select(attrs={'class': 'form-control'}),
+            'attendance_status': forms.Select(attrs={'class': 'form-control'}),
+        }
 
-        def clean_courseClass(self):
-            data = self.cleaned_data['courseClass']
-            if len(data) > 3:
-                raise forms.ValidationError("You must select at least 3 classes.")
-            return data
-
-        def clean_data(self):
-            date = self.cleaned_data['date']
-            if date.weekday() >4:
-                raise forms.ValidationError("Please select a date from Monday to Friday.")
-            return date
-
+    def clean_day_of_week(self):
+        day = self.cleaned_data['day_of_week']
+        if day not in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']:
+            raise forms.ValidationError("Please select a valid weekday.")
+        return day

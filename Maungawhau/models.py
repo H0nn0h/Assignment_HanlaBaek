@@ -109,9 +109,25 @@ class CourseClass(models.Model):
 
 
 class CollegeDay(models.Model):
-    date = models.DateField()
+    STUDENT_STATUS = [
+        ('Present', 'Present'),
+        ('Absent', 'Absent'),
+    ]
+
+    student = models.ManyToManyField(Student, blank=True)
     courseClass = models.ForeignKey(CourseClass, on_delete=models.CASCADE)
-    student = models.ManyToManyField(Student)
+    day_of_week = models.CharField(
+        max_length=10,
+        choices=[
+            ('Monday', 'Monday'),
+            ('Tuesday', 'Tuesday'),
+            ('Wednesday', 'Wednesday'),
+            ('Thursday', 'Thursday'),
+            ('Friday', 'Friday')
+        ],
+        default='Monday'
+    )
+    attendance_status = models.CharField(max_length=10, choices=STUDENT_STATUS, default='Absent')
 
     def __str__(self):
-        return f'{self.courseClass} on {self.date} ({self.student.count()} students)'
+        return f'{self.student} - {self.courseClass} ({self.day_of_week})'

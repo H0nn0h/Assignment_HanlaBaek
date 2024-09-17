@@ -4,7 +4,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, D
 from django.urls import reverse_lazy, reverse
 from Maungawhau.models import CourseClass, Semester, Course, Lecturer, Profile, Student, CollegeDay
 from Maungawhau.forms import createCourseClassForm, createLecturerForm, createCoursesForm, createSemestersForm, \
-    createStudentsForm, createCollegeDaysForm
+    createStudentsForm, CollegeDayForm
 from django.contrib.auth.models import User
 
 from django.db.models import Q
@@ -46,10 +46,6 @@ class SemesterDetailView(DetailView):
     template_name = 'semester_detail.html'
 
 
-class CollegeDayDetailView(DetailView):
-    model = CollegeDay
-    template_name = 'collegeday_detail.html'
-
 
 class ClassCreateView(CreateView):
     model = CourseClass
@@ -89,18 +85,6 @@ class SemesterCreateView(CreateView):
     def get_success_url(self):
         return reverse('semester_list')
 
-
-class CollegeDayCreateView(CreateView):
-    model = CollegeDay
-    form_class = createCollegeDaysForm
-    template_name = 'collegeday_create.html'
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('collegeday_list')
 
 
 # generate unique username
@@ -195,13 +179,6 @@ class SemesterUpdateView(UpdateView):
     success_url = reverse_lazy('semester_list')
 
 
-class CollegedayUpdateView(UpdateView):
-    model = CollegeDay
-    form_class = createCollegeDaysForm
-    template_name = 'collegeday_update.html'
-    context_object_name = 'collegeday'
-    success_url = reverse_lazy('collegeday_list')
-
 
 class LecturerUpdateView(UpdateView):
     model = Lecturer
@@ -253,10 +230,7 @@ class CourseListView(ListView):
     template_name = 'course_list.html'
     context_object_name = 'courses'
 
-class CollegedayListView(ListView):
-    model = CollegeDay
-    template_name = 'collegeday_list.html'
-    context_object_name = 'collegedays'
+
 
 class LecturerListView(ListView):
     model = Lecturer
@@ -302,6 +276,8 @@ class CourseDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('course_list')
+
+
 
 
 class LecturerDeleteView(DeleteView):
@@ -396,18 +372,34 @@ def create_semester(request):
     return render(request, 'semester_create.html')
 
 
+def college_day_list(request):
+    days = CollegeDay.objects.all()
+    form = CollegeDayForm()
+
+    if request.method == 'POST':
+        form = CollegeDayForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('college_day_list')
+
+    return render(request, 'college_day_list.html', {
+        'days': days,
+        'form': form
+    })
+
+
 # need to make connection with student
 def attend_or_not(request):
     if request.method == 'POST':
-        courseClass_id = request.POST.get('course_id')
-        courseClass = CourseClass.objects.get(id=courseClass_id)
-        # 참석 추가/제거 처리
-        if request.user in courseClass.attendances.all():
-            courseClass.attendances.remove(request.user)
+        collegeDay_id = request.POST.get('collegeDay_id')
+        collegeDay = CourseClass.objects.get(id=collegeDay_id)
+        # attend  / or not
+        if request.user in collegeDay.attendances.all():
+            collegeDay.attendances.remove(request.user)
         else:
-            courseClass.attendances.add(request.user)
+            collegeDay.attendances.add(request.user)
 
-        return render(request, 'class_detail.html', {'object': courseClass})
+        return render(request, 'collegeday_detail.html', {'object': collegeDay})
 
 
 class ProfileView(DetailView):

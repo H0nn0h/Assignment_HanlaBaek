@@ -5,7 +5,7 @@ from Maungawhau.views import HomeView, ClassDetailView, ClassUpdateView, ClassDe
     SemesterListView, CourseDeleteView, CourseListView, LecturerDeleteView, LecturerListView, StudentDeleteView, \
     StudentListView, SemesterCreateView, CourseCreateView, LecturerCreateView, StudentCreateView, LecturerUpdateView, \
     LecturerDetailView, CourseDetailView, CourseUpdateView, SemesterUpdateView, SemesterDetailView, StudentUpdateView, \
-    StudentDetailView, ClassCreateView
+    StudentDetailView, ClassCreateView, college_day_list
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -48,5 +48,9 @@ urlpatterns = [
     path('students/', StudentListView.as_view(), name='student_list'),
     path('student/<int:pk>/update/', StudentUpdateView.as_view(), name='student_update'),
     path('student_detail/<int:pk>/', StudentDetailView.as_view(), name='student_detail'),
+
+    #CollegeDay URLs
+
+    path('college_day_list/', college_day_list, name='college_day_list'),
 
 ]
