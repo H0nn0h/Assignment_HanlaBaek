@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
@@ -46,7 +47,6 @@ class SemesterDetailView(DetailView):
     template_name = 'semester_detail.html'
 
 
-
 class ClassCreateView(CreateView):
     model = CourseClass
     form_class = createCourseClassForm
@@ -84,7 +84,6 @@ class SemesterCreateView(CreateView):
 
     def get_success_url(self):
         return reverse('semester_list')
-
 
 
 # generate unique username
@@ -179,7 +178,6 @@ class SemesterUpdateView(UpdateView):
     success_url = reverse_lazy('semester_list')
 
 
-
 class LecturerUpdateView(UpdateView):
     model = Lecturer
     form_class = createLecturerForm
@@ -231,6 +229,14 @@ class CourseListView(ListView):
     context_object_name = 'courses'
 
 
+class CollegeDayListView(ListView):
+    model = CollegeDay
+    template_name = 'collegeday_list.html'
+    context_object_name = 'college_days'
+
+    def get_queryset(self):
+        return CollegeDay.objects.all().prefetch_related('student', 'courseClass')
+
 
 class LecturerListView(ListView):
     model = Lecturer
@@ -276,8 +282,6 @@ class CourseDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('course_list')
-
-
 
 
 class LecturerDeleteView(DeleteView):
@@ -372,36 +376,57 @@ def create_semester(request):
     return render(request, 'semester_create.html')
 
 
-def college_day_list(request):
-    days = CollegeDay.objects.all()
-    form = CollegeDayForm()
-
+def college_day_create(request):
     if request.method == 'POST':
         form = CollegeDayForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('college_day_list')
 
-    return render(request, 'college_day_list.html', {
-        'days': days,
-        'form': form
-    })
+            form.save()
+            messages.success(request, 'Create successfully')
+            return redirect('college_day_create')  # 성공 시 리다이렉트
+        else:
+            print(form.errors)  # 유효성 검사 오류를 출력하여 디버깅에 사용
+    else:
+        form = CollegeDayForm()
+
+    return render(request, 'college_day_create.html', {'form': form})
+
+
+def college_day_list(request):
+    college_days = CollegeDay.objects.all()
+    return render(request, 'collegeday_list.html', {'college_days': college_days})
 
 
 # need to make connection with student
-def attend_or_not(request):
-    if request.method == 'POST':
-        collegeDay_id = request.POST.get('collegeDay_id')
-        collegeDay = CourseClass.objects.get(id=collegeDay_id)
-        # attend  / or not
-        if request.user in collegeDay.attendances.all():
-            collegeDay.attendances.remove(request.user)
-        else:
-            collegeDay.attendances.add(request.user)
+def attend_or_not(request, pk):
+    college_day = CollegeDay.objects.get(id=pk)
+    course_Class = college_day.courseClass
+    if request.user in course_Class.attendances.all():
+        course_Class.attendances.remove(request.user)
+    else:
+        course_Class.attendances.add(request.user)
 
-        return render(request, 'collegeday_detail.html', {'object': collegeDay})
+    return redirect('collegeDay_list')
 
 
+# attendance for student
+def student_attendance_view(request):
+    if request.user.is_authenticated:
+        student = Student.objects.get(user=request.user)
+        attendances = CollegeDay.objects.filter(student=student)
+        return render(request, 'student_attendance.html', {'attendances': attendances})
+    else:
+        return redirect('login')
+
+# attendance for lecturer
+def lecturer_attendance_view(request):
+    if request.user.is_authenticated:
+        lecturer = Lecturer.objects.get(user=request.user)
+        course_Class =CourseClass.objects.filter(lecturers=lecturer)
+        attendances = CollegeDay.objects.filter(courseClass__in=course_Class)
+        return render(request,'lecturer_attendance.html',{'attendances': attendances})
+    else:
+        return redirect('login')
 class ProfileView(DetailView):
     model = User
     template_name = 'profile.html'

@@ -129,12 +129,30 @@ class createSemestersForm(forms.ModelForm):
 class CollegeDayForm(forms.ModelForm):
     class Meta:
         model = CollegeDay
-        fields = ['student', 'courseClass', 'day_of_week', 'attendance_status']
+        fields = ['student', 'courseClass', 'day_of_week']  # 필요한 필드만 추가
 
-        widgets = {
-            'day_of_week': forms.Select(attrs={'class': 'form-control'}),
-            'attendance_status': forms.Select(attrs={'class': 'form-control'}),
-        }
+    student = forms.ModelMultipleChoiceField(
+        queryset=Student.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True  # 필수 필드
+    )
+    courseClass = forms.ModelChoiceField(
+        queryset=CourseClass.objects.all(),
+        required=True  # 필수 필드
+    )
+    day_of_week = forms.ChoiceField(
+        choices=[('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'),
+                 ('Thursday', 'Thursday'), ('Friday', 'Friday')],
+        required=True  # 필수 필드
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['student'].label_from_instance = self.get_student_label
+
+    def get_student_label(self, student):
+        # Display both student ID and name in the dropdown
+        return f"{student.student_id} - {student.user.first_name} {student.user.last_name}"
 
     def clean_day_of_week(self):
         day = self.cleaned_data['day_of_week']

@@ -82,13 +82,12 @@
 
                 <section class="right-panels">
                     <div class="header-section">
-                       
+
                         <div class="create-new">
                             <h1>Create New Class</h1>
-                            <form method="POST" action="{% url 'class_create' %}">
+                            <form method="POST" action="{% url 'confirm_enrollment' %}">
                                 {% csrf_token %}
                                 {{ form.as_p }}
-
                                 <button type="submit" class="btn btn-primary">Create class</button>
                             </form>
                         </div>

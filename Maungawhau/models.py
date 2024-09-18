@@ -102,18 +102,13 @@ class CourseClass(models.Model):
     attendances = models.ManyToManyField(User, related_name='course_class_attendances', blank=True)
 
     def __str__(self):
-        return f's{self.number} -{self.course.name}'
+        return f'{self.semester.semester}_{self.number} - {self.course.name}'
 
     def get_absolute_url(self):
         return f'/class_detail/{self.id}/'
 
 
 class CollegeDay(models.Model):
-    STUDENT_STATUS = [
-        ('Present', 'Present'),
-        ('Absent', 'Absent'),
-    ]
-
     student = models.ManyToManyField(Student, blank=True)
     courseClass = models.ForeignKey(CourseClass, on_delete=models.CASCADE)
     day_of_week = models.CharField(
@@ -127,7 +122,27 @@ class CollegeDay(models.Model):
         ],
         default='Monday'
     )
-    attendance_status = models.CharField(max_length=10, choices=STUDENT_STATUS, default='Absent')
 
     def __str__(self):
         return f'{self.student} - {self.courseClass} ({self.day_of_week})'
+
+
+class Attendance(models.Model):
+    STATUS_CHOICES = [
+        ('P', 'Present'),
+        ('A', 'Absent'),
+    ]
+
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    college_day = models.ForeignKey(CollegeDay, on_delete=models.CASCADE)
+    course_class = models.ForeignKey(CourseClass, on_delete=models.CASCADE)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='A')
+
+    def __str__(self):
+        return f"{self.student.username} - {self.course_class.name} on {self.college_day.date}"
+
+    class Meta:
+        permissions = [
+            ("can_view_lecturer_attendance", "Can view lecturer attendance"),
+            ("can_enter_attendance", "Can enter attendance"),
+        ]

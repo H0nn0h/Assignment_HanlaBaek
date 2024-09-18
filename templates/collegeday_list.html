@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1>College Day List</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Course Class</th>
+            <th>Day of Week</th>
+            <th>Students</th>
+            <th>Attendance</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for day in college_days %}
+            <tr>
+                <td>{{ day.id }}</td>
+                <td>{{ day.courseClass }}</td>
+                <td>{{ day.day_of_week }}</td>
+                <td>
+                    {% for student in day.student.all %}
+                        {{ student.id }} - {{ student.first_name }} {{ student.last_name }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% if request.user in day.courseClass.attendances.all %}
+                        Present
+                    {% else %}
+                        Absent
+                    {% endif %}
+                </td>
+
+                <td>
+                    <form method="POST" action="{% url 'attend_or_not' day.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-info">Attend</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <form method="post"
+          enctype="multipart/form-data"
+          action="{% url 'load_user_from_file' %}">
+        {% csrf_token %}
+        <input type="file" name="Maungawhau.xlsx">
+        <button type="submit">Load</button>
+    </form>
+
+{% endblock %}

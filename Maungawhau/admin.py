@@ -12,7 +12,7 @@ from Maungawhau.models import Student, Course, Lecturer, CourseClass, CollegeDay
 # admin.site.register(Course)
 # admin.site.register(Lecturer)
 # admin.site.register(CourseClass)
-admin.site.register(CollegeDay)
+# admin.site.register(CollegeDay)
 
 
 # admin.site.register(Semester)
@@ -92,3 +92,11 @@ class SemesterAdmin(admin.ModelAdmin):
 @admin.register(CourseClass)
 class CourseClassAdmin(admin.ModelAdmin):
     list_display = ('id', 'course', 'lecturers', 'semester')
+
+@admin.register(CollegeDay)
+class CollegeDayAdmin(admin.ModelAdmin):
+    list_display = ('id', 'get_students', 'courseClass', 'day_of_week')
+
+    def get_students(self, obj):
+        return ", ".join([str(student) for student in obj.student.all()])
+    get_students.short_description = 'Students'

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+   <h2>Attendance Records</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Course Class</th>
+            <th>College Day</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in attendance_records %}
+        <tr>
+            <td>{{ record.student.username }}</td>
+            <td>{{ record.course_class.name }}</td>
+            <td>{{ record.college_day.date }}</td>
+            <td>{{ record.get_status_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

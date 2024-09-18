@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <h1>Your Attendance</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Course Class</th>
+            <th>Day of Week</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for attendance in attendances %}
+            <tr>
+                <td>{{ attendance.courseClass }}</td>
+                <td>{{ attendance.day_of_week }}</td>
+                <td>
+                    {% if request.user in attendance.courseClass.attendances.all %}
+                        Present
+                    {% else %}
+                        Absent
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
