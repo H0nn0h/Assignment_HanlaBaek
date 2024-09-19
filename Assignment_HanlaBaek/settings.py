@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Assignment_HanlaBaek.wsgi.application'
+WSGI_APPLICATION = 'Assignment_HanlaBaek.wsgi.app'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
