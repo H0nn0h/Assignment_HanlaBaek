@@ -1,12 +1,13 @@
 from django import views
 from django.urls import path
+
+from Maungawhau.models import lecturer_attendance
 from Maungawhau.views import HomeView, ClassDetailView, ClassUpdateView, ClassDeleteView, create_class, \
     attend_or_not, create_profile, register_user, load_user_from_file, ClassListView, SemesterDeleteView, \
     SemesterListView, CourseDeleteView, CourseListView, LecturerDeleteView, LecturerListView, StudentDeleteView, \
     StudentListView, SemesterCreateView, CourseCreateView, LecturerCreateView, StudentCreateView, LecturerUpdateView, \
     LecturerDetailView, CourseDetailView, CourseUpdateView, SemesterUpdateView, SemesterDetailView, StudentUpdateView, \
     StudentDetailView, ClassCreateView, college_day_create, college_day_create, CollegeDayListView
-
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -54,7 +55,8 @@ urlpatterns = [
 
     path('college_day_create/', college_day_create, name='college_day_create'),
     path('collegedays/', CollegeDayListView.as_view(), name='collegeDay_list'),
-    path('college_day/<int:pk>/attendance', attend_or_not, name='attend_or_not'),
-    #attendances
+    path(' college_day/<int:pk>/attendance', attend_or_not, name='attend_or_not'),
+    # attendances
+    path('lecturer/attendance/', lecturer_attendance, name='lecturer_attendance'),
 
 ]

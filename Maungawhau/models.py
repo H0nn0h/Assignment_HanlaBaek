@@ -2,6 +2,8 @@ from profile import Profile
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.shortcuts import render
+from django.views import View
 
 
 # Create your models here.
@@ -146,3 +148,12 @@ class Attendance(models.Model):
             ("can_view_lecturer_attendance", "Can view lecturer attendance"),
             ("can_enter_attendance", "Can enter attendance"),
         ]
+
+def lecturer_attendance(request):
+    # logic for the view
+    return render(request, 'lecturer_attendance.html')
+
+class LecturerAttendanceView(View):
+    def get(self, request):
+        # logic for GET requests
+        return render(request, 'lecturer_attendance.html')

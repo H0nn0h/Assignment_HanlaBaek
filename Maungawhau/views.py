@@ -6,7 +6,7 @@ from django.urls import reverse_lazy, reverse
 from Maungawhau.models import CourseClass, Semester, Course, Lecturer, Profile, Student, CollegeDay
 from Maungawhau.forms import createCourseClassForm, createLecturerForm, createCoursesForm, createSemestersForm, \
     createStudentsForm, CollegeDayForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 from django.db.models import Q
 from django.views.generic import ListView
@@ -513,3 +513,15 @@ def load_user_from_file(request):
         # 예외 처리 및 에러 응답 반환
         print(f"Error processing file: {str(e)}")
         return HttpResponse(f"Error processing file: {str(e)}", status=500)
+
+
+def user_group_view(request):
+    user =request.user
+    lecturer_group = Group.objects.get(name='Lecturer')
+    student_group = Group.objects.get(name='Student')
+
+    context={
+        'is_lecturer': user.groups.filter(id=lecturer_group.id).exists(),
+        'is_student': user.groups.filter(id=student_group.id).exists(),
+    }
+    return render(request, 'base.html',context)

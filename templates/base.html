@@ -117,8 +117,16 @@
                 </form>
             {% endif %}
         </div>
-        <!--Only admin-->
+        {% if user.is_lecturer %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'lecturer_attendance' %}">View Attendance</a>
+            </li>
+        {% endif %}
+        {% if is_student %}
+            <!--student-->
+        {% endif %}
         {% if user.is_staff %}
+            <!--Only admin-->
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#classDropdown" role="button" aria-expanded="false"
                    aria-controls="classDropdown">
@@ -185,19 +193,12 @@
                     </ul>
                 </div>
             </li>
-            {% if user_is_lecturer %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'lecturer_attendance' %}">View Attendance</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'enter_attendance' %}">Enter Attendance</a>
-                </li>
-            {% endif %}
-
-            <li class="nav-item">
-
-            </li>
         {% endif %}
+
+
+        <li class="nav-item">
+
+        </li>
     </ul>
 </div>
 

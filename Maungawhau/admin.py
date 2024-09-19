@@ -4,6 +4,7 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
+from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.models import User, Group
 from Maungawhau.models import Student, Course, Lecturer, CourseClass, CollegeDay, Semester
 
@@ -24,6 +25,12 @@ def assign_to_group(modeladmin, request, queryset, group_name):
         user.groups.add(group)
         modeladmin.message_user(request, f"Selected users have been added to {group_name}")
 
+class GroupAdmin(BaseGroupAdmin):
+    def get_users(self, obj):
+        return ", ".join([user.username for user in obj.user_set.all()])
+
+    get_users.short_description = "Users in this group"
+    list_display = ('name','get_users')
 
 def assign_to_admin_group(modeladmin, request, queryset):
     assign_to_group(modeladmin, request, queryset, 'Admin')
@@ -34,9 +41,9 @@ def assign_to_lecturer_group(modeladmin, request, queryset):
     for user in queryset:
         user.groups.add(group)
 
-        # 동시에 Lecturer 모델에 등록
+
         if not Lecturer.objects.filter(user=user).exists():
-            Lecturer.objects.create(user=user, DOB=date(1981, 10, 1))  # 필요시 DOB 등을 실제 데이터로 수정하세요
+            Lecturer.objects.create(user=user, DOB=date(1981, 10, 1))
 
         modeladmin.message_user(request, f"{user.username} has been added to Lecturer group and registered as Lecturer")
 
@@ -50,11 +57,12 @@ assign_to_student_group.short_description = "Add selected users to Student group
 assign_to_lecturer_group.short_description = "Add selected users to Lecturer group"
 
 admin.site.unregister(User)
-
+admin.site.unregister(Group)
+admin.site.register(Group, GroupAdmin)
 
 @admin.register(User)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'id', 'get_dob')
+    list_display = ('username', 'email', 'id', 'get_dob','is_staff')
     actions = [assign_to_admin_group, assign_to_lecturer_group, assign_to_student_group]
 
     def get_dob(self, obj):
