@@ -111,7 +111,7 @@ class CourseClass(models.Model):
 
 
 class CollegeDay(models.Model):
-    student = models.ManyToManyField(Student, blank=True)
+    student = models.ManyToManyField(Student, related_name='college_days')
     courseClass = models.ForeignKey(CourseClass, on_delete=models.CASCADE)
     day_of_week = models.CharField(
         max_length=10,

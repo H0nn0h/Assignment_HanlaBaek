@@ -85,7 +85,7 @@
 
                         <div class="create-new">
                             <h1>Create New Class</h1>
-                            <form method="POST" action="{% url 'confirm_enrollment' %}">
+                            <form method="POST" action="{% url 'class_create' %}">
                                 {% csrf_token %}
                                 {{ form.as_p }}
                                 <button type="submit" class="btn btn-primary">Create class</button>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1>Student Details</h1>
+    <p>ID: {{ student.student_id }}</p>
+    <p>Name: {{ student.user.first_name }} {{ student.user.last_name }}</p>
+    <p>Email: <a href="mailto:{{ student.user.email }}">{{ student.user.email }}</a></p>
+
+    <h2>College Days</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Course Class</th>
+            <th>Day of Week</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for day in college_days %}
+            <tr>
+                <td>{{ day.id }}</td>
+                <td>{{ day.courseClass }}</td>
+                <td>{{ day.day_of_week }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

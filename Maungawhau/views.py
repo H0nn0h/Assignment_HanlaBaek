@@ -418,6 +418,16 @@ def student_attendance_view(request):
     else:
         return redirect('login')
 
+def student_attend_detail(request,student_id):
+    student = get_object_or_404(Student, id=student_id)
+    college_days = CollegeDay.objects.filter(student=student)
+    context ={
+        'student': student,
+        'college_day' : college_days,
+    }
+    return render(request, 'student_attend_detail.html', context)
+
+
 # attendance for lecturer
 def lecturer_attendance_view(request):
     if request.user.is_authenticated:
