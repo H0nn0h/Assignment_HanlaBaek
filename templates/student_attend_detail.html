@@ -6,25 +6,38 @@
     <p>ID: {{ student.student_id }}</p>
     <p>Name: {{ student.user.first_name }} {{ student.user.last_name }}</p>
     <p>Email: <a href="mailto:{{ student.user.email }}">{{ student.user.email }}</a></p>
+    <p>Phone: {{ student.phone }}</p>
+    <p>Address: {{ student.address }}</p>
 
     <h2>College Days</h2>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Course Class</th>
-            <th>Day of Week</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for day in college_days %}
+    {% if college_day %}
+        <table class="table">
+            <thead>
             <tr>
-                <td>{{ day.id }}</td>
-                <td>{{ day.courseClass }}</td>
-                <td>{{ day.day_of_week }}</td>
+                <th>ID</th>
+                <th>Course Class</th>
+                <th>Day of Week</th>
+                <th>Attendance</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
+            </thead>
+            <tbody>
+            {% for day in college_day %}
+                <tr>
+                    <td>{{ day.id }}</td>
+                    <td>{{ day.courseClass }}</td>
+                    <td>{{ day.day_of_week }}</td>
+                    <td>
+                        {% if request.user in day.courseClass.attendances.all %}
+                            Present
+                        {% else %}
+                            Absent
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No college days found for this student.</p>
+    {% endif %}
 {% endblock %}

@@ -399,12 +399,13 @@ def college_day_list(request):
 
 # need to make connection with student
 def attend_or_not(request, pk):
-    college_day = CollegeDay.objects.get(id=pk)
-    course_Class = college_day.courseClass
-    if request.user in course_Class.attendances.all():
-        course_Class.attendances.remove(request.user)
+    college_day = get_object_or_404(CollegeDay, id=pk)
+    course_class = college_day.courseClass
+
+    if request.user in course_class.attendances.all():
+        course_class.attendances.remove(request.user)
     else:
-        course_Class.attendances.add(request.user)
+        course_class.attendances.add(request.user)
 
     return redirect('collegeDay_list')
 
@@ -418,25 +419,28 @@ def student_attendance_view(request):
     else:
         return redirect('login')
 
-def student_attend_detail(request,student_id):
+
+def student_attend_detail(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     college_days = CollegeDay.objects.filter(student=student)
-    context ={
+
+    context = {
         'student': student,
-        'college_day' : college_days,
+        'college_day': college_days,
     }
     return render(request, 'student_attend_detail.html', context)
-
 
 # attendance for lecturer
 def lecturer_attendance_view(request):
     if request.user.is_authenticated:
         lecturer = Lecturer.objects.get(user=request.user)
-        course_Class =CourseClass.objects.filter(lecturers=lecturer)
+        course_Class = CourseClass.objects.filter(lecturers=lecturer)
         attendances = CollegeDay.objects.filter(courseClass__in=course_Class)
-        return render(request,'lecturer_attendance.html',{'attendances': attendances})
+        return render(request, 'lecturer_attendance.html', {'attendances': attendances})
     else:
         return redirect('login')
+
+
 class ProfileView(DetailView):
     model = User
     template_name = 'profile.html'
@@ -526,12 +530,12 @@ def load_user_from_file(request):
 
 
 def user_group_view(request):
-    user =request.user
+    user = request.user
     lecturer_group = Group.objects.get(name='Lecturer')
     student_group = Group.objects.get(name='Student')
 
-    context={
+    context = {
         'is_lecturer': user.groups.filter(id=lecturer_group.id).exists(),
         'is_student': user.groups.filter(id=student_group.id).exists(),
     }
-    return render(request, 'base.html',context)
+    return render(request, 'base.html', context)

@@ -15,7 +15,6 @@ from Maungawhau.models import Student, Course, Lecturer, CourseClass, CollegeDay
 # admin.site.register(CourseClass)
 # admin.site.register(CollegeDay)
 
-
 # admin.site.register(Semester)
 
 

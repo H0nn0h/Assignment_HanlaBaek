@@ -3,29 +3,39 @@
 
 {% block content %}
 
-    <h1>Your Attendance</h1>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Course Class</th>
-            <th>Day of Week</th>
-            <th>Status</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for attendance in attendances %}
+    <h2>College Days</h2>
+    {% if college_day %}
+        <table class="table">
+            <thead>
             <tr>
-                <td>{{ attendance.courseClass }}</td>
-                <td>{{ attendance.day_of_week }}</td>
-                <td>
-                    {% if request.user in attendance.courseClass.attendances.all %}
-                        Present
-                    {% else %}
-                        Absent
-                    {% endif %}
-                </td>
+                <th>ID</th>
+                <th>Course Class</th>
+                <th>Day of Week</th>
+                <th>Attendance</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for day in college_day %}
+                <tr>
+                    <td>{{ day.id }}</td>
+                    <td>{{ day.courseClass }}</td>
+                    <td>{{ day.day_of_week }}</td>
+                    <td>
+                        {% for record in attendance_records %}
+                            {% if record.college_day == day and record.student == student.user %}
+                                {% if record.status == 'P' %}
+                                    Present
+                                {% else %}
+                                    Absent
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No college days found for this student.</p>
+    {% endif %}
 {% endblock %}
