@@ -11,6 +11,7 @@ from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from django.views.generic import ListView
 import pandas as pd
+import logging
 
 
 # Create your views here.
@@ -20,6 +21,31 @@ class HomeView(ListView):
     template_name = 'home.html'
     ordering = ['-created_at']
 
+
+logger = logging.getLogger(__name__)
+
+
+def home(request):
+    is_student = False
+    is_lecturer = False
+    is_staff = False
+    student = None
+
+    if request.user.is_authenticated:
+        if request.user.groups.filter(name='Student').exists():
+            student = get_object_or_404(Student, user=request.user)
+            is_student = True
+        elif request.user.groups.filter(name='Lecturer').exists():
+            is_lecturer = True
+        elif request.user.is_staff:
+            is_staff = True
+
+    return render(request, 'home.html', {
+        'is_student': is_student,
+        'is_lecturer': is_lecturer,
+        'is_staff': is_staff,
+        'student': student,
+    })
 
 class ClassDetailView(DetailView):
     model = CourseClass
@@ -429,6 +455,7 @@ def student_attend_detail(request, student_id):
         'college_day': college_days,
     }
     return render(request, 'student_attend_detail.html', context)
+
 
 # attendance for lecturer
 def lecturer_attendance_view(request):

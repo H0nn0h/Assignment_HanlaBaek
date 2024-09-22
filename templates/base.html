@@ -100,10 +100,10 @@
 <div class="sidebar">
     {% load static %}
     <img src="{% static 'images/logo.png' %}" alt="logo" class="logo navbar-brand text-light">
+    <p>is_student: {{ is_student }}</p>
+    <p>Student ID: {{ student.student_id }}</p>
+
     <ul class="navbar-nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
         <div class="nav-item">
             {% if user.is_authenticated %}
                 <form method="post" action="{% url 'logout' %}">
@@ -117,18 +117,24 @@
                 </form>
             {% endif %}
         </div>
-        {% if user.is_lecturer %}
+
+        {% if is_student %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'student_attend_detail' student_id=student.student_id %}">View Attendance</a>
+            </li>
+        {% elif is_lecturer %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'lecturer_attendance' %}">View Attendance</a>
             </li>
-        {% endif %}
-        {% if is_student %}
-            <!--student-->
-        {% endif %}
-        {% if user.is_staff %}
+        {% elif user.is_staff %}
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+
             <!--Only admin-->
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#classDropdown" role="button" aria-expanded="false"
+                <a class="nav-link" data-bs-toggle="collapse" href="#classDropdown" role="button"
+                   aria-expanded="false"
                    aria-controls="classDropdown">
                     Class Information <i class="fas fa-chevron-down"></i>
                 </a>
@@ -140,7 +146,8 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#courseDropdown" role="button" aria-expanded="false"
+                <a class="nav-link" data-bs-toggle="collapse" href="#courseDropdown" role="button"
+                   aria-expanded="false"
                    aria-controls="courseDropdown">
                     Course Information <i class="fas fa-chevron-down"></i>
                 </a>
@@ -171,12 +178,13 @@
                     Student Information <i class="fas fa-chevron-down"></i>
                 </a>
                 <div class="collapse" id="studentDropdown">
+
                     <ul class="list-unstyled">
+
                         <li><a class="nav-link" href="{% url 'student_list' %}">Student list</a></li>
                         <li><a class="nav-link" href="{% url 'student_create' %}">Student Create</a></li>
                         <li><a class="nav-link" href="{% url 'college_day_create' %}">Student Enroll</a></li>
                         <li><a class="nav-link" href="{% url 'collegeDay_list' %}">Enroll List</a></li>
-
                     </ul>
                 </div>
             </li>
@@ -199,7 +207,8 @@
         <li class="nav-item">
 
         </li>
-    </ul>
+</div>
+</ul>
 </div>
 
 <!-- 상단 네비게이션 바 -->
