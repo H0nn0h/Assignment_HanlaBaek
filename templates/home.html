@@ -3,20 +3,37 @@
     Home
 {% endblock %}
 {% block content %}
-    <h1>Welcome to Maungawhau college </h1>
-    <!--only authenticated user can write post-->
+    <h1>Welcome to Maungawhau College</h1>
+    <!-- only authenticated user can view this content -->
     {% if user.is_authenticated %}
-        <B>Hello:{{ user.username }}</B> <br>
-        <B>Group: {{ user.groups.all|join:"," }}</B> <br>
-        <a href="{% url 'class_create' %}">Select Class</a>
+        <b>Hello: {{ user.username }}</b><br>
+        <b>Group: {{ user_groups|join:', ' }}</b><br>
+
+        <!-- 학생/강사에 따라 ID 정보 출력 -->
+        {% if student %}
+            <p>Student ID: {{ student.student_id }}</p>
+        {% elif lecturer %}
+            <p>Lecturer ID: {{ lecturer.staff_id }}</p>
+        {% endif %}
+
     {% endif %}
-    <ul><br>
-        {% for courseClass in object_list %}
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const studentId = "{{ student.student_id|default:'' }}";
+            const lecturerId = "{{ lecturer.staff_id|default:'' }}";
 
+            // 학생이면 학생 출석 팝업을 자동으로 열기
+            if (studentId) {
+                const url = "{% url 'student_attend_detail' 0 %}".replace('0', studentId);
+                window.open(url, 'popup', 'width=600,height=400');
+            }
 
-
-
-        {% endfor %}
-    </ul>
+            // 강사이면 강사 출석 팝업을 자동으로 열기
+            if (lecturerId) {
+                const url = "{% url 'lecturer_attend_detail' 0 %}".replace('0', lecturerId);
+                window.open(url, 'popup', 'width=600,height=400');
+            }
+        });
+    </script>
 {% endblock %}

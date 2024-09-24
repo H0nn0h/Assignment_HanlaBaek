@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
@@ -11,41 +13,44 @@ from django.contrib.auth.models import User, Group
 from django.db.models import Q
 from django.views.generic import ListView
 import pandas as pd
-import logging
 
-
-# Create your views here.
 
 class HomeView(ListView):
     model = CourseClass
     template_name = 'home.html'
     ordering = ['-created_at']
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-logger = logging.getLogger(__name__)
+        # 로그인 여부 확인
+        if self.request.user.is_authenticated:
+            # 사용자 그룹을 가져옴
+            user_groups = list(self.request.user.groups.values_list('name', flat=True))
 
+            # 현재 사용자의 student 객체를 가져옴
+            try:
+                student = Student.objects.get(user=self.request.user)
+            except Student.DoesNotExist:
+                student = None
 
-def home(request):
-    is_student = False
-    is_lecturer = False
-    is_staff = False
-    student = None
+            try:
+                lecturer = Lecturer.objects.get(user=self.request.user)
+            except Lecturer.DoesNotExist:
+                lecturer = None
 
-    if request.user.is_authenticated:
-        if request.user.groups.filter(name='Student').exists():
-            student = get_object_or_404(Student, user=request.user)
-            is_student = True
-        elif request.user.groups.filter(name='Lecturer').exists():
-            is_lecturer = True
-        elif request.user.is_staff:
-            is_staff = True
+            # 추가 context 데이터 전달
+            context['student'] = student
+            context['lecturer'] = lecturer
+            context['user_groups'] = user_groups
+        else:
+            # 로그인되지 않은 사용자를 위한 기본 context
+            context['student'] = None
+            context['lecturer'] = None
+            context['user_groups'] = []
 
-    return render(request, 'home.html', {
-        'is_student': is_student,
-        'is_lecturer': is_lecturer,
-        'is_staff': is_staff,
-        'student': student,
-    })
+        return context
+
 
 class ClassDetailView(DetailView):
     model = CourseClass
@@ -447,7 +452,7 @@ def student_attendance_view(request):
 
 
 def student_attend_detail(request, student_id):
-    student = get_object_or_404(Student, id=student_id)
+    student = get_object_or_404(Student, student_id=student_id)
     college_days = CollegeDay.objects.filter(student=student)
 
     context = {
@@ -455,6 +460,18 @@ def student_attend_detail(request, student_id):
         'college_day': college_days,
     }
     return render(request, 'student_attend_detail.html', context)
+
+
+def lecturer_attend_detail(request, staff_id):
+    lecturer = get_object_or_404(Lecturer, staff_id=staff_id)
+    course_class = CourseClass.objects.filter(lecturers=lecturer)
+    college_days = CollegeDay.objects.filter(courseClass__in=course_class)
+
+    context = {
+        'lecturer': lecturer,
+        'college_days': college_days,
+    }
+    return render(request, 'lecturer_attend_detail.html', context)
 
 
 # attendance for lecturer
@@ -543,9 +560,15 @@ def load_user_from_file(request):
         course_class_numbers = course_class_data['number'].values.tolist()
         course_class_courses = course_class_data['course'].values.tolist()
         for i in range(len(course_class_numbers)):
-            number = course_class_numbers[i]
+            first_name = student_first_names[i]
+            last_name = student_last_names[i]
+            email = student_emails[i]
+            dob = student_dobs[i]
+            class_number = course_class_numbers[i]
             course = course_class_courses[i]
-            print(f"Course Class Number: {number}, Course: {course}")
+
+            print(f"Student: {first_name} {last_name}, Email: {email}, DOB: {dob}")
+            print(f"Course Class Number: {class_number}, Course: {course}")
 
         # 처리 완료 후 성공 메시지 반환
         return HttpResponse("File processed successfully")

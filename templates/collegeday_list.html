@@ -23,7 +23,7 @@
                 <td>{{ day.day_of_week }}</td>
                 <td>
                     {% for student in day.student.all %}
-                        <a href="{% url 'student_attend_detail' student.id %}">>
+                        <a href="{% url 'student_attend_detail' student.student_id %}">>
                             {{ student.student_id }} - {{ student.user.first_name }} {{ student.user.last_name }}<br>
                         </a><br>
                     {% endfor %}

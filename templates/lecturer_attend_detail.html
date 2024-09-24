@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1>College Day List</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Course Class</th>
+            <th>Day of Week</th>
+            <th>Students</th>
+            <th>Attendance</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for day in college_days %}
+            <tr>
+                <td>{{ day.id }}</td>
+                <td>{{ day.courseClass }}</td>
+                <td>{{ day.day_of_week }}</td>
+                <td>
+                    {% for student in day.courseClass.students.all %}
+                        <a href="{% url 'student_attend_detail' student.student_id %}">
+                            {{ student.student_id }} - {{ student.user.first_name }} {{ student.user.last_name }}
+                        </a><br>
+                    {% endfor %}
+                </td>
+                <td id="attendance-status-{{ day.id }}">
+                    {% if request.user in day.courseClass.attendances.all %}
+                        Present
+                    {% else %}
+                        Absent
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-info mark-attendance" data-day-id="{{ day.id }}">
+                        Mark Attendance
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'load_user_from_file' %}">
+        {% csrf_token %}
+        <input type="file" name="Maungawhau.xlsx">
+        <button type="submit">Load</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const csrfToken = '{{ csrf_token }}';
+            
+            // Attach event listeners to each "Mark Attendance" button
+            document.querySelectorAll('.mark-attendance').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const dayId = this.getAttribute('data-day-id');
+
+                    // Send an AJAX POST request to update attendance
+                    fetch("{% url 'attend_or_not' 0 %}".replace('0', dayId), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({ 'day_id': dayId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update the attendance status in the table
+                            document.getElementById(`attendance-status-${dayId}`).textContent = data.new_status;
+                        } else {
+                            alert('Failed to mark attendance.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
+{% endblock %}
