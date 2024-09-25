@@ -2,8 +2,50 @@
 {% load static %}
 
 {% block content %}
-    <h1>College Day List</h1>
+    <style>
+        table {
+            width: 100%;
+            table-layout: fixed; /* 고정된 테이블 레이아웃 */
+            border-collapse: separate;
+            border-spacing: 10px 15px; /* 가로와 세로 간격 조정 */
+        }
+        
+        th, td {
+            padding: 10px;
+            
+           
+        }
 
+        /* 학생 열 */
+        td.students {
+            width: 40%; /* 학생 이름 열의 너비 */
+            text-align: left; /* 학생 이름은 왼쪽 정렬 */
+        }
+
+        /* Attendance 열 */
+        td.attendance {
+            width: 20%; /* Attendance 열의 너비 */
+        }
+
+        /* Actions 열 */
+        td.actions {
+            width: 20%; /* Actions 열의 너비 */
+        }
+
+        /* 버튼 간격 조정 */
+        button {
+            margin-bottom: 5px;
+        }
+    </style>
+    
+    <h1>Lecturer Details</h1>
+    <p>ID: {{ lecturer.staff_id }}</p>
+    <p>Name: {{ lecturer.user.first_name }} {{ lecturer.user.last_name }}</p>
+    <p>Email: <a href="mailto:{{ lecturer.user.email }}">{{ lecturer.user.email }}</a></p>
+    <p>Phone: {{ lecturer.phone }}</p>
+    <p>Address: {{ lecturer.address }}</p>
+    
+    <h1>College Day List</h1>
     <table class="table">
         <thead>
         <tr>
@@ -21,66 +63,41 @@
                 <td>{{ day.id }}</td>
                 <td>{{ day.courseClass }}</td>
                 <td>{{ day.day_of_week }}</td>
-                <td>
-                    {% for student in day.courseClass.students.all %}
+                <td class="students">
+                    {% for student in day.student.all %}
                         <a href="{% url 'student_attend_detail' student.student_id %}">
                             {{ student.student_id }} - {{ student.user.first_name }} {{ student.user.last_name }}
                         </a><br>
                     {% endfor %}
                 </td>
-                <td id="attendance-status-{{ day.id }}">
-                    {% if request.user in day.courseClass.attendances.all %}
-                        Present
-                    {% else %}
-                        Absent
-                    {% endif %}
+                <td class="attendance">
+                     {% for student in day.student.all %}
+                        <span id="attendance-{{ day.id }}-{{ student.student_id }}">
+                            {% if student.user in day.courseClass.attendances.all %}
+                                Present
+                            {% else %}
+                                Absent
+                            {% endif %}
+                        </span><br>
+                    {% endfor %}
                 </td>
-                <td>
-                    <button class="btn btn-sm btn-info mark-attendance" data-day-id="{{ day.id }}">
-                        Mark Attendance
-                    </button>
+                <td class="actions">
+                    {% for student in day.student.all %}
+                        <form method="POST" action="{% url 'attend_or_not' day.id student.student_id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-info">
+                                {% if student.user in day.courseClass.attendances.all %}
+                                    Mark Absent
+                                {% else %}
+                                    Mark Present
+                                {% endif %}
+                            </button>
+                        </form>
+                        <br>
+                    {% endfor %}
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
-    <form method="post" enctype="multipart/form-data" action="{% url 'load_user_from_file' %}">
-        {% csrf_token %}
-        <input type="file" name="Maungawhau.xlsx">
-        <button type="submit">Load</button>
-    </form>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const csrfToken = '{{ csrf_token }}';
-            
-            // Attach event listeners to each "Mark Attendance" button
-            document.querySelectorAll('.mark-attendance').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    const dayId = this.getAttribute('data-day-id');
-
-                    // Send an AJAX POST request to update attendance
-                    fetch("{% url 'attend_or_not' 0 %}".replace('0', dayId), {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        },
-                        body: JSON.stringify({ 'day_id': dayId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update the attendance status in the table
-                            document.getElementById(`attendance-status-${dayId}`).textContent = data.new_status;
-                        } else {
-                            alert('Failed to mark attendance.');
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                });
-            });
-        });
-    </script>
 {% endblock %}

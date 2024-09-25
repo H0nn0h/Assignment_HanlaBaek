@@ -23,6 +23,7 @@
             const studentId = "{{ student.student_id|default:'' }}";
             const lecturerId = "{{ lecturer.staff_id|default:'' }}";
 
+            
             // 학생이면 학생 출석 팝업을 자동으로 열기
             if (studentId) {
                 const url = "{% url 'student_attend_detail' 0 %}".replace('0', studentId);

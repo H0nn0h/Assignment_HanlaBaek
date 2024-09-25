@@ -326,9 +326,11 @@ class LecturerDeleteView(DeleteView):
 class StudentDeleteView(DeleteView):
     model = Student
     template_name = 'student_delete.html'
+    success_url = reverse_lazy('student_list')
 
-    def get_success_url(self):
-        return reverse_lazy('students_list')
+    def get_object(self, queryset=None):
+        student_id = self.kwargs.get('pk')
+        return get_object_or_404(Student, student_id=student_id)
 
 
 def create_class(request):
@@ -429,14 +431,14 @@ def college_day_list(request):
 
 
 # need to make connection with student
-def attend_or_not(request, pk):
+def attend_or_not(request, pk, student_id):
     college_day = get_object_or_404(CollegeDay, id=pk)
-    course_class = college_day.courseClass
+    student = get_object_or_404(Student, student_id=student_id)
 
-    if request.user in course_class.attendances.all():
-        course_class.attendances.remove(request.user)
+    if student.user in college_day.courseClass.attendances.all():
+        college_day.courseClass.attendances.remove(student.user)
     else:
-        course_class.attendances.add(request.user)
+        college_day.courseClass.attendances.add(student.user)
 
     return redirect('collegeDay_list')
 
@@ -477,7 +479,7 @@ def lecturer_attend_detail(request, staff_id):
 # attendance for lecturer
 def lecturer_attendance_view(request):
     if request.user.is_authenticated:
-        lecturer = Lecturer.objects.get(user=request.user)
+        lecturer = get_object_or_404(Lecturer, user=request.user)
         course_Class = CourseClass.objects.filter(lecturers=lecturer)
         attendances = CollegeDay.objects.filter(courseClass__in=course_Class)
         return render(request, 'lecturer_attendance.html', {'attendances': attendances})

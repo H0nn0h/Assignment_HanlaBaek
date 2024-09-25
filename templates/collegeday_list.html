@@ -2,6 +2,31 @@
 {% load static %}
 
 {% block content %}
+    <style>
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    td {
+        padding: 10px;
+    }
+
+    /* 각 행 간의 간격 조정 */
+    tr {
+        margin-bottom: 10px;
+        display: table-row;
+    }
+    
+    /* 버튼 간격 조정 */
+    button {
+        margin-bottom: 5px;
+    }
+
+</style>
+
+
     <h1>College Day List</h1>
 
     <table class="table">
@@ -17,41 +42,46 @@
         </thead>
         <tbody>
         {% for day in college_days %}
+            {% for student in day.student.all %}
             <tr>
                 <td>{{ day.id }}</td>
                 <td>{{ day.courseClass }}</td>
                 <td>{{ day.day_of_week }}</td>
                 <td>
-                    {% for student in day.student.all %}
-                        <a href="{% url 'student_attend_detail' student.student_id %}">>
-                            {{ student.student_id }} - {{ student.user.first_name }} {{ student.user.last_name }}<br>
-                        </a><br>
-                    {% endfor %}
+                    <a href="{% url 'student_attend_detail' student.student_id %}">
+                        {{ student.student_id }} - {{ student.user.first_name }} {{ student.user.last_name }}
+                    </a>
                 </td>
                 <td>
-                    {% if request.user in day.courseClass.attendances.all %}
+                    {% if student.user in day.courseClass.attendances.all %}
                         Present
                     {% else %}
                         Absent
                     {% endif %}
                 </td>
-
                 <td>
-                    <form method="POST" action="{% url 'attend_or_not' day.id %}">
+                    <form method="POST" action="{% url 'attend_or_not' day.id student.student_id %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-info">Attend</button>
+                        <button type="submit" class="btn btn-sm btn-info">
+                            {% if student.user in day.courseClass.attendances.all %}
+                                Mark Absent
+                            {% else %}
+                                Mark Present
+                            {% endif %}
+                        </button>
                     </form>
                 </td>
             </tr>
+            {% endfor %}
         {% endfor %}
         </tbody>
     </table>
-    <form method="post"
-          enctype="multipart/form-data"
-          action="{% url 'load_user_from_file' %}">
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'load_user_from_file' %}">
         {% csrf_token %}
         <input type="file" name="Maungawhau.xlsx">
         <button type="submit">Load</button>
     </form>
 
 {% endblock %}
+

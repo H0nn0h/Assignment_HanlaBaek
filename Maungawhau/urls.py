@@ -56,9 +56,9 @@ urlpatterns = [
 
     path('college_day_create/', college_day_create, name='college_day_create'),
     path('collegedays/', CollegeDayListView.as_view(), name='collegeDay_list'),
-    path('college_day/<int:pk>/attendance/', attend_or_not, name='attend_or_not'),
+    path('college_day/<int:pk>/<int:student_id>/attendance/', attend_or_not, name='attend_or_not'),
     # attendances
     path('lecturer/attendance/', lecturer_attendance, name='lecturer_attendance'),
     path('student/<int:student_id>', student_attend_detail, name='student_attend_detail'),
-    path('lecturer/<int:staff_id>', lecturer_attend_detail, name='lecturer_attend_detail')
+    path('lecturer/<int:staff_id>/attendance', lecturer_attend_detail, name='lecturer_attend_detail')
 ]

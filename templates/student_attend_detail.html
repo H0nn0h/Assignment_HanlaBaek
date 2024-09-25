@@ -27,7 +27,7 @@
                     <td>{{ day.courseClass }}</td>
                     <td>{{ day.day_of_week }}</td>
                     <td>
-                        {% if request.user in day.courseClass.attendances.all %}
+                        {% if student.user in day.courseClass.attendances.all %}
                             Present
                         {% else %}
                             Absent
